@@ -1,4 +1,4 @@
-from api_possible_requests.decorators import premium_required
+from .decorators import premium_required
 
 
 @premium_required
@@ -127,7 +127,7 @@ def lookup_player_contracts_by_id(player_id: int) -> str:
     return f'lookupcontracts.php?id={player_id}'
 
 
-def lookup_event_player_results_by_id(event_id: int) -> str:
+def lookup_event_player_results_by_event_id(event_id: int) -> str:
     """
     Event Player Results by Event Id.
 
@@ -161,7 +161,7 @@ def lookup_table_by_league_and_season(league_id: int, season: str) -> str:
 
 def lookup_equipment_by_team_id(team_id: int) -> str:
     """
-    Lookup Equipment by Team ID.
+    Lookup Equipment (kits) by Team ID.
 
     :param team_id: Team's id, e.g. 133597.
     :return: str

@@ -1,4 +1,4 @@
-from api_possible_requests.decorators import premium_required
+from .decorators import premium_required
 
 
 @premium_required
@@ -117,7 +117,7 @@ def tv_events_on_day(day: str = None, sport: str = None, station_country: str = 
     return "eventstv.php?" + "&".join(params)
 
 
-def events_in_season_by_league(league_id: int, season: str) -> str:
+def events_in_league_by_season(league_id: int, season: str) -> str:
     """
     All events in a specific league by season (Free tier limited to 100 events).
 

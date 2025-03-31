@@ -1,4 +1,4 @@
-from api_possible_requests.decorators import premium_required
+from .decorators import premium_required
 
 
 def search_team_by_name(name: str) -> str:

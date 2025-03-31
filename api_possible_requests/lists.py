@@ -1,4 +1,4 @@
-from api_possible_requests.decorators import premium_required
+from .decorators import premium_required
 
 
 @premium_required
