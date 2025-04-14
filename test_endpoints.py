@@ -1,6 +1,5 @@
 import json
 import requests
-from tools import load_config
 
 from api_possible_requests.lists import list_all_leagues, list_all_countries, list_all_leagues_in_country, \
     list_all_seasons_in_league, list_all_teams_in_league, list_all_users_loved_teams_and_players
@@ -11,6 +10,7 @@ from api_possible_requests.lookups import lookup_player_details_by_id, lookup_ve
 from api_possible_requests.schedules import events_last_5_by_team_id, events_by_round, events_in_league_by_season
 from api_possible_requests.searches import search_team_by_name, search_team_by_shortcode, search_player_by_name, \
     search_event_by_event_name, search_event_by_file_name, search_venue_by_name
+from config import Config
 
 
 def test_endpoint(function, *args, **kwargs):
@@ -35,7 +35,8 @@ def test_endpoint(function, *args, **kwargs):
         print(f'Error, status code: {status}')
 
 
-api_key, base_url = load_config()
+config = Config()
+api_key, base_url = config.get_credentials()
 
 # search functions
 test_endpoint(search_team_by_name, 'Real_Madrid')
