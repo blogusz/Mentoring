@@ -1,4 +1,4 @@
-from .decorators import premium_required
+from sports_api.endpoints.decorators import premium_required
 
 
 class Searches:

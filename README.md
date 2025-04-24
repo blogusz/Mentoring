@@ -14,12 +14,8 @@ source. It has a request limit of 100 requests per minute on free tier.
 
 - The **https://www.thesportsdb.com/** free sports API was chosen.
 - Created functions for all available API requests and stored them in
-  **[api_possible_requests](api_possible_requests/)**
-  directory.
-- Separated the functions by the type of
-  operation - **[searches](api_possible_requests/searches.py)**, **[lists](api_possible_requests/lists.py)**,
-  **[lookups](api_possible_requests/lookups.py)**
-  and **[schedules](api_possible_requests/schedules.py)**.
+  `api_possible_requests` directory.
+- Separated the functions by the type of operation - `searches`, `lists`, `lookups` and `schedules`.
 - Added decorator for premium functions.
 
 **TODO**
@@ -33,7 +29,7 @@ source. It has a request limit of 100 requests per minute on free tier.
 
 **DONE**
 
-- Added ability to save data.
+- Added option to save data.
 - Refactored the test functions.
 - Reorganized the project structure.
 
@@ -59,3 +55,20 @@ source. It has a request limit of 100 requests per minute on free tier.
 - Create the API Client class.
 - Create project configuration file in YAML.
 - Start logging messages instead of printing them.
+
+### Week 4
+
+**DONE**
+
+- Completely restructured the project into the `sports_api` package.
+- Implemented service-oriented architecture while retaining the previous separation of requests by type.
+- Created a user-friendly `ApiClient` class that abstracts away implementation details.
+- Organized code into logical components: endpoints, services, and core modules.
+- Added comprehensive documentation with usage examples.
+
+**TODO**
+
+- Add unit tests for all components.
+- Implement logging instead of print statements.
+- Create a project configuration file in YAML or TOML (Poetry).
+- Add data analysis using Pandas.
