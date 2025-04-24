@@ -17,7 +17,7 @@ class DataScraper:
         :param end_round: Number of the last round to retrieve (inclusive).
         :return:
         """
-        from api_possible_requests.schedules import Schedules
+        from sports_api.endpoints.schedules import Schedules
 
         api_key, base_url = config.get_credentials()
         all_matches = []
