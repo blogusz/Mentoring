@@ -7,14 +7,24 @@ from time import sleep
 
 class DataScraper:
     @staticmethod
-    def retrieve_all_rounds(config, league_id, season, start_round, end_round):
-        from api_possible_requests.schedules import events_by_round
+    def _retrieve_all_rounds(config: object, league_id: int, season: str, start_round: int, end_round: int) -> list[
+        Any]:
+        """
+        :param config: Config class object containing the API key.
+        :param league_id: League ID (e.g. 4335 for Spanish La Liga).
+        :param season: Season (e.g. '2024-2025').
+        :param start_round: Number of the first round to retrieve.
+        :param end_round: Number of the last round to retrieve (inclusive).
+        :return:
+        """
+        from api_possible_requests.schedules import Schedules
 
         api_key, base_url = config.get_credentials()
         all_matches = []
+        schedules = Schedules()
 
         for round_number in range(start_round, end_round + 1):
-            endpoint = events_by_round(league_id, round_number, season)
+            endpoint = schedules.events_by_round(league_id, round_number, season)
             url = f'{base_url}/{api_key}/{endpoint}'
             print(f'Retrieving data for round {round_number}: {url}')
 
@@ -36,7 +46,11 @@ class DataScraper:
         return all_matches
 
     @staticmethod
-    def make_directory(path):
+    def _make_directory(path: str):
+        """
+        :param path: Path where the folder will be created.
+        :return: bool
+        """
         if not os.path.exists(path):
             try:
                 os.makedirs(path)
@@ -45,14 +59,14 @@ class DataScraper:
                 print(f'Error while making directory {path}: {e}')
                 return False
 
-    def save_json_file(self, data: list[Any], output_path: str = 'retrieved_data/raw/',
-                       output_file: str = 'data.json') -> None:
+    def _save_json_file(self, data: list[Any], output_path: str = 'retrieved_data/raw/',
+                        output_file: str = 'data.json') -> None:
         """
         :param output_path: Path where the data will be saved.
         :param output_file: Name of the file where the data will be saved.
         :param data: Variable with the data to be saved.
         """
-        self.make_directory(output_path)
+        self._make_directory(output_path)
 
         output_file_path = os.path.join(output_path, output_file)
         with open(output_file_path, 'w', encoding='utf-8') as f:
@@ -60,7 +74,7 @@ class DataScraper:
         print(f'Data saved to directory: {output_file_path}')
 
     def scrape_all_rounds(self, config, league_id: int, season: str, start_round: int, end_round: int,
-                          output_path: str = '',
+                          output_path: str = 'retrieved_data/raw/',
                           output_file: str = None, save_data=False) -> list[Any]:
         """
         The function retrieves data from the API for consecutive rounds (from start_round to end_round inclusive) for the specified season and league, and then saves all the returned data to a single JSON file.
@@ -76,7 +90,7 @@ class DataScraper:
         :rtype: list[Any]
         """
 
-        all_rounds_data = self.retrieve_all_rounds(config, league_id, season, start_round, end_round)
+        all_rounds_data = self._retrieve_all_rounds(config, league_id, season, start_round, end_round)
         if save_data:
-            self.save_json_file(all_rounds_data, output_path, output_file)
+            self._save_json_file(all_rounds_data, output_path, output_file)
         return all_rounds_data
