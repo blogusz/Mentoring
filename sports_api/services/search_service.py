@@ -2,7 +2,7 @@ from typing import Dict, Any
 import requests
 
 from sports_api.config import Config
-from sports_api.endpoints.decorators import premium_required
+from sports_api.services.decorators import premium_required
 
 
 class SearchService:
