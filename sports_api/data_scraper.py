@@ -1,13 +1,14 @@
-import os
-from typing import Any
-import requests
 import json
+import os
 from time import sleep
+from typing import Any
+
+from sports_api.config import Config
 
 
 class DataScraper:
     @staticmethod
-    def _retrieve_all_rounds(config: object, league_id: int, season: str, start_round: int, end_round: int) -> list[
+    def _retrieve_all_rounds(config: Config, league_id: int, season: str, start_round: int, end_round: int) -> list[
         Any]:
         """
         :param config: Config class object containing the API key.
@@ -17,21 +18,16 @@ class DataScraper:
         :param end_round: Number of the last round to retrieve (inclusive).
         :return:
         """
-        from sports_api.endpoints.schedules import Schedules
+        from sports_api.services.schedule_service import ScheduleService
 
-        api_key, base_url = config.get_credentials()
+        schedule_service = ScheduleService(config)
         all_matches = []
-        schedules = Schedules()
 
         for round_number in range(start_round, end_round + 1):
-            endpoint = schedules.events_by_round(league_id, round_number, season)
-            url = f'{base_url}/{api_key}/{endpoint}'
-            print(f'Retrieving data for round {round_number}: {url}')
+            print(f'Retrieving data for round {round_number}')
 
             try:
-                response = requests.get(url)
-                response.raise_for_status()
-                data = response.json()
+                data = schedule_service.get_events_by_round(league_id, round_number, season)
                 if data and data.get('events'):
                     matches = data['events']
                     all_matches.extend(matches)

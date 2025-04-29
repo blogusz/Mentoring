@@ -64,7 +64,7 @@ class ApiClient:
         """
         Search for a team by name.
 
-        :param name: Team name to search for
+        :param name: Team name to search for, e.g. 'Arsenal'
         :return: Search results
         """
         return self._search_service.search_team_by_name(name)
@@ -73,7 +73,7 @@ class ApiClient:
         """
         Search for a player by name.
 
-        :param name: Player name to search for
+        :param name: Player name to search for (e.g. 'Danny'/'Welbeck'/'Danny_Welbeck')
         :return: Search results
         """
         return self._search_service.search_player_by_name(name)
@@ -82,7 +82,7 @@ class ApiClient:
         """
         Search for an event by name.
 
-        :param event_name: Event name to search for
+        :param event_name: Event name to search for (e.g. 'Arsenal_vs_Chelsea', 'Arsenal_vs_Chelsea&s=2016-2017')
         :return: Search results
         """
         return self._search_service.search_event_by_name(event_name)
@@ -90,7 +90,7 @@ class ApiClient:
     # List methods
     def get_all_leagues(self) -> Dict[str, Any]:
         """
-        Get a list of all leagues.
+        Get a list of all leagues (limited to 50 on free tier).
 
         :return: List of leagues
         """
@@ -106,10 +106,10 @@ class ApiClient:
 
     def get_leagues_in_country(self, country: str, sport: Optional[str] = None) -> Dict[str, Any]:
         """
-        Get a list of all leagues in a country.
+        Get a list of all leagues in a country (limited to 50 on free tier).
 
-        :param country: Country name
-        :param sport: Optional sport name to filter by
+        :param country: Country name, e.g. 'England'
+        :param sport: Optional sport name to filter by, e.g 'Soccer'
         :return: List of leagues in the country
         """
         return self._list_service.get_all_leagues_in_country(country, sport)
@@ -120,8 +120,8 @@ class ApiClient:
         Get a list of all teams in a league.
 
         :param league_name: League name
-        :param sport: Optional sport name
-        :param country: Optional country name
+        :param sport: Optional sport name, e.g 'Soccer'
+        :param country: Optional country name, e.g. 'Spain'
         :return: List of teams in the league
         """
         return self._list_service.get_all_teams_in_league(league_name, sport, country)
@@ -129,11 +129,11 @@ class ApiClient:
     def get_seasons_in_league(self, league_id: int, poster: Optional[int] = None, badge: Optional[int] = None) -> Dict[
         str, Any]:
         """
-        Get a list of all seasons in a league.
+        Get a list of all seasons in a league (or show posters and badges from seasons)..
 
-        :param league_id: League ID
-        :param poster: Optional poster ID
-        :param badge: Optional badge ID
+        :param league_id: League ID, e.g. '4328'
+        :param poster: Optional poster ID, e.g. '1'
+        :param badge: Optional badge ID, e.g. '1'
         :return: List of seasons in the league
         """
         return self._list_service.get_all_seasons_in_league(league_id, poster, badge)
@@ -161,7 +161,7 @@ class ApiClient:
         """
         Search for an event by file name.
 
-        :param file_name: Event file name to search for
+        :param file_name: Event file name to search for, e.g. 'English_Premier_League_2015-04-26_Arsenal_vs_Chelsea'
         :return: Search results
         """
         return self._search_service.search_event_by_file_name(file_name)
@@ -170,7 +170,7 @@ class ApiClient:
         """
         Search for a venue by name.
 
-        :param name: Venue name to search for
+        :param name: Venue name to search for, e.g. 'Wembley'
         :return: Search results
         """
         return self._search_service.search_venue_by_name(name)
@@ -180,7 +180,7 @@ class ApiClient:
         """
         Get details for a player.
 
-        :param player_id: Player ID
+        :param player_id: Player ID, e.g. 34145937
         :return: Player details
         """
         return self._lookup_service.get_player_details(player_id)
@@ -189,7 +189,7 @@ class ApiClient:
         """
         Get details for a venue.
 
-        :param venue_id: Venue ID
+        :param venue_id: Venue ID, e.g. 16163
         :return: Venue details
         """
         return self._lookup_service.get_venue_details(venue_id)
@@ -198,7 +198,7 @@ class ApiClient:
         """
         Get honours for a player.
 
-        :param player_id: Player ID
+        :param player_id: Player ID, e.g. 34147178
         :return: Player honours
         """
         return self._lookup_service.get_player_honours(player_id)
@@ -207,7 +207,7 @@ class ApiClient:
         """
         Get milestones for a player.
 
-        :param player_id: Player ID
+        :param player_id: Player ID, e.g. 34161397
         :return: Player milestones
         """
         return self._lookup_service.get_player_milestones(player_id)
@@ -216,7 +216,7 @@ class ApiClient:
         """
         Get former teams for a player.
 
-        :param player_id: Player ID
+        :param player_id: Player ID, e.g. 34147178
         :return: Player former teams
         """
         return self._lookup_service.get_player_former_teams(player_id)
@@ -234,7 +234,7 @@ class ApiClient:
         """
         Get player results for an event.
 
-        :param event_id: Event ID
+        :param event_id: Event ID, e.g. 652890
         :return: Event player results
         """
         return self._lookup_service.get_event_player_results(event_id)
@@ -243,8 +243,8 @@ class ApiClient:
         """
         Get the league table for a league and season.
 
-        :param league_id: League ID
-        :param season: Season
+        :param league_id: League ID, e.g. 4328
+        :param season: Season, e.g. '2020-2021'
         :return: League table
         """
         return self._lookup_service.get_league_table(league_id, season)
@@ -253,7 +253,7 @@ class ApiClient:
         """
         Get equipment (kits) for a team.
 
-        :param team_id: Team ID
+        :param team_id: Team ID, e.g. 133597
         :return: Team equipment
         """
         return self._lookup_service.get_team_equipment(team_id)
@@ -261,30 +261,39 @@ class ApiClient:
     # Schedule methods
     def get_last_5_events_by_team(self, team_id: int) -> Dict[str, Any]:
         """
-        Get the last 5 events for a team.
+        Get the last 5 events for a team (limited to home team for free tier).
 
-        :param team_id: Team ID
+        :param team_id: Team ID, e.g. 133602
         :return: Last 5 events
         """
         return self._schedule_service.get_last_5_events_by_team(team_id)
 
     def get_events_by_round(self, league_id: int, round_number: int, season: str) -> Dict[str, Any]:
         """
-        Get events for a specific round in a league.
+        Get events for a specific round in a league by league id/round/season.
 
-        :param league_id: League ID
-        :param round_number: Round number
-        :param season: Season
+        :param league_id: League ID, e.g. 4328
+        :param round_number: Round number, e.g. 38
+        :param season: Season, e.g. '2014-2015'
         :return: Events in the round
+
+        \n Note: Special round numbers:
+          - Round 125 = Quarter-Final
+          - Round 150 = Semi-Final
+          - Round 160 = Playoff
+          - Round 170 = Playoff Semi-Final
+          - Round 180 = Playoff Final
+          - Round 200 = Final
+          - Round 500 = Pre-Season
         """
         return self._schedule_service.get_events_by_round(league_id, round_number, season)
 
     def get_events_in_league_by_season(self, league_id: int, season: str) -> Dict[str, Any]:
         """
-        Get all events in a league for a season.
+        Get all events in a league for a season (Free tier limited to 100 events).
 
-        :param league_id: League ID
-        :param season: Season
+        :param league_id: League ID, e.g. 4328
+        :param season: Season, e.g. '2014-2015'
         :return: Events in the league for the season
         """
         return self._schedule_service.get_events_in_league_by_season(league_id, season)
