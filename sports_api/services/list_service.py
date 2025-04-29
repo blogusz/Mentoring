@@ -11,29 +11,13 @@ class ListService(BaseService):
     """
 
     def get_all_leagues(self) -> Dict[str, Any]:
-        """
-        List all leagues (limited 50 on free tier).
-
-        :return: List of leagues
-        """
         return self._make_request('all_leagues.php')
 
     def get_all_countries(self) -> Dict[str, Any]:
-        """
-        Get a list of all countries.
-
-        :return: List of countries
-        """
         return self._make_request('all_countries.php')
 
     def get_all_leagues_in_country(self, country: str, sport: Optional[str] = None) -> Dict[str, Any]:
         """
-        Get a list of all leagues in a country (limited 50 on free tier).
-
-        :param country: Country name, e.g. 'England'
-        :param sport: Optional sport name to filter by, e.g 'Soccer'
-        :return: List of leagues in the country
-
         \n Example 1: search_all_leagues.php?c=England
         \n Example 2: search_all_leagues.php?c=England&s=Soccer
         """
@@ -46,13 +30,6 @@ class ListService(BaseService):
     def get_all_seasons_in_league(self, league_id: int, poster: Optional[int] = None, badge: Optional[int] = None) -> \
             Dict[str, Any]:
         """
-        Get a list of all seasons in a league (or show posters and badges from seasons).
-
-        :param league_id: League ID, e.g. '4328'
-        :param poster: Optional poster ID, e.g. '1'
-        :param badge: Optional badge ID, e.g. '1'
-        :return: List of seasons in the league
-
         \n Example: search_all_leagues.php?c=England&s=Soccer
         """
         if poster:
@@ -66,13 +43,6 @@ class ListService(BaseService):
     def get_all_teams_in_league(self, league_name: str, sport: Optional[str] = None, country: Optional[str] = None) -> \
             Dict[str, Any]:
         """
-        Get a list of all teams in a league.
-
-        :param league_name: League name
-        :param sport: Optional sport name, e.g 'Soccer'
-        :param country: Optional country name, e.g. 'Spain'
-        :return: List of teams in the league
-
         \n Example 1: search_all_teams.php?l=English%20Premier%20League
         \n Example 2: search_all_teams.php?s=Soccer&c=Spain
         """
@@ -83,16 +53,9 @@ class ListService(BaseService):
         return self._make_request(endpoint)
 
     def get_all_users_loved_teams_and_players(self, username: str) -> Dict[str, Any]:
-        """
-        Get a list of all users loved teams and players.
-
-        :param username: Username
-        :return: List of loved teams and players
-        """
         endpoint = f'searchloves.php?u={username}'
         return self._make_request(endpoint)
 
-    # Premium methods - these will only work with a premium API key
     @premium_required
     def get_all_sports(self) -> Dict[str, Any]:
         """

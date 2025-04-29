@@ -10,50 +10,18 @@ class ScheduleService(BaseService):
     This is an internal class not meant to be used directly by users.
     """
 
-    # Non-premium methods
     def get_last_5_events_by_team(self, team_id: int) -> Dict[str, Any]:
-        """
-        Get the last 5 events for a team (limited to home team for free tier).
-
-        :param team_id: Team ID, e.g. 133602
-        :return: Last 5 events
-        """
         endpoint = f'eventslast.php?id={team_id}'
         return self._make_request(endpoint)
 
     def get_events_by_round(self, league_id: int, round_number: int, season: str) -> Dict[str, Any]:
-        """
-        Get events for a specific round in a league by league id/round/season.
-
-        :param league_id: League ID, e.g. 4328
-        :param round_number: Round number, e.g. 38
-        :param season: Season, e.g. '2014-2015'
-        :return: Events in the round
-
-        \n Note: Special round numbers:
-          - Round 125 = Quarter-Final
-          - Round 150 = Semi-Final
-          - Round 160 = Playoff
-          - Round 170 = Playoff Semi-Final
-          - Round 180 = Playoff Final
-          - Round 200 = Final
-          - Round 500 = Pre-Season
-        """
         endpoint = f'eventsround.php?id={league_id}&r={round_number}&s={season}'
         return self._make_request(endpoint)
 
     def get_events_in_league_by_season(self, league_id: int, season: str) -> Dict[str, Any]:
-        """
-        Get all events in a league for a season (Free tier limited to 100 events).
-
-        :param league_id: League ID, e.g. 4328
-        :param season: Season, e.g. '2014-2015'
-        :return: Events in the league for the season
-        """
         endpoint = f'eventsseason.php?id={league_id}&s={season}'
         return self._make_request(endpoint)
 
-    # Premium methods - these will only work with a premium API key
     @premium_required
     def get_next_5_events_by_team(self, team_id: int) -> Dict[str, Any]:
         """

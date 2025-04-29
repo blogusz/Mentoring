@@ -10,99 +10,42 @@ class LookupService(BaseService):
     This is an internal class not meant to be used directly by users.
     """
 
-    # Non-premium methods
     def get_player_details(self, player_id: int) -> Dict[str, Any]:
-        """
-        Get details for a player.
-
-        :param player_id: Player ID, e.g. 34145937
-        :return: Player details
-        """
         endpoint = f'lookupplayer.php?id={player_id}'
         return self._make_request(endpoint)
 
     def get_venue_details(self, venue_id: int) -> Dict[str, Any]:
-        """
-        Get details for a venue.
-
-        :param venue_id: Venue ID, e.g. 16163
-        :return: Venue details
-        """
         endpoint = f'lookupvenue.php?id={venue_id}'
         return self._make_request(endpoint)
 
     def get_player_honours(self, player_id: int) -> Dict[str, Any]:
-        """
-        Get honours for a player.
-
-        :param player_id: Player ID, e.g. 34147178
-        :return: Player honours
-        """
         endpoint = f'lookuphonours.php?id={player_id}'
         return self._make_request(endpoint)
 
     def get_player_milestones(self, player_id: int) -> Dict[str, Any]:
-        """
-        Get milestones for a player.
-
-        :param player_id: Player ID, e.g. 34161397
-        :return: Player milestones
-        """
         endpoint = f'lookupmilestones.php?id={player_id}'
         return self._make_request(endpoint)
 
     def get_player_former_teams(self, player_id: int) -> Dict[str, Any]:
-        """
-        Get former teams for a player.
-
-        :param player_id: Player ID, e.g. 34147178
-        :return: Player former teams
-        """
         endpoint = f'lookupformerteams.php?id={player_id}'
         return self._make_request(endpoint)
 
     def get_player_contracts(self, player_id: int) -> Dict[str, Any]:
-        """
-        Get contracts for a player.
-
-        :param player_id: Player ID
-        :return: Player contracts
-        """
         endpoint = f'lookupcontracts.php?id={player_id}'
         return self._make_request(endpoint)
 
     def get_event_player_results(self, event_id: int) -> Dict[str, Any]:
-        """
-        Get player results for an event.
-
-        :param event_id: Event ID, e.g. 652890
-        :return: Event player results
-        """
         endpoint = f'eventresults.php?id={event_id}'
         return self._make_request(endpoint)
 
     def get_league_table(self, league_id: int, season: str) -> Dict[str, Any]:
-        """
-        Get the league table for a league and season.
-
-        :param league_id: League ID, e.g. 4328
-        :param season: Season, e.g. '2020-2021'
-        :return: League table
-        """
         endpoint = f'lookuptable.php?l={league_id}&s={season}'
         return self._make_request(endpoint)
 
     def get_team_equipment(self, team_id: int) -> Dict[str, Any]:
-        """
-        Get equipment (kits) for a team.
-
-        :param team_id: Team ID, e.g. 133597
-        :return: Team equipment
-        """
         endpoint = f'lookupequipment.php?id={team_id}'
         return self._make_request(endpoint)
 
-    # Premium methods - these will only work with a premium API key
     @premium_required
     def get_league_details(self, league_id: int) -> Dict[str, Any]:
         """
