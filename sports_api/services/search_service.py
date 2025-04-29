@@ -1,32 +1,14 @@
 from typing import Dict, Any
-import requests
 
-from sports_api.config import Config
+from sports_api.services.base_service import BaseService
 from sports_api.services.decorators import premium_required
 
 
-class SearchService:
+class SearchService(BaseService):
     """
     Service class for handling search-related operations.
     This is an internal class not meant to be used directly by users.
     """
-
-    def __init__(self, config: Config):
-        self.config = config
-
-    def _make_request(self, endpoint: str) -> Dict[str, Any]:
-        """
-        Make a request to the API.
-
-        :param endpoint: API endpoint to call
-        :return: JSON response as a dictionary
-        """
-        api_key, base_url = self.config.get_credentials()
-        url = f'{base_url}/{api_key}/{endpoint}'
-
-        response = requests.get(url)
-        response.raise_for_status()
-        return response.json()
 
     def search_team_by_name(self, name: str) -> Dict[str, Any]:
         """
