@@ -159,10 +159,12 @@ The API client is implemented using a service-oriented architecture:
 - `ApiClient`: The main entry point for interacting with the API. It delegates calls to the appropriate service.
 - `Config`: Handles API configuration, including loading API keys from environment variables.
 - `DataScraper`: Provides utilities for scraping and saving data from the API.
-- `endpoints`: Contains the low-level endpoint definitions for the API.
-- `services`: Contains the service implementations that connect the client to the endpoints:
+- `services`: Contains the service implementations that handle API requests:
+    - `BaseService`: Base class that provides common functionality for all services, including the `_make_request` method.
     - `RoundsService`: Handles retrieving data for rounds.
     - `SearchService`: Handles searching for teams, players, and events.
     - `ListService`: Handles retrieving lists of leagues, countries, teams, etc.
     - `LookupService`: Handles looking up details for players, teams, events, etc.
     - `ScheduleService`: Handles retrieving schedule data.
+
+Each service class directly constructs and calls the appropriate API endpoints. Methods marked with the `@premium_required` decorator require a premium API subscription.

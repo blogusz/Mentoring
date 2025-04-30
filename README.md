@@ -72,3 +72,20 @@ source. It has a request limit of 100 requests per minute on free tier.
 - Implement logging instead of print statements.
 - Create a project configuration file in YAML or TOML (Poetry).
 - Add data analysis using Pandas.
+
+### Week 5
+
+**DONE**
+
+- Integrated endpoint functionality directly into service classes, simplifying the architecture.
+- Implemented configuration loading from YAML files instead of environment variables.
+- Created a `BaseService` class to eliminate code duplication across service classes.
+- Added unit tests for all service classes using pytest and mocking.
+- Updated documentation to reflect the current project structure.
+
+**TODO**
+
+- Create a standalone data scraper interface for scheduled data collection.
+- Implement logging instead of print statements.
+- Add integration tests for the ApiClient class.
+- Add data analysis functionality using Pandas.
