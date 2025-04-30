@@ -13,7 +13,7 @@ class RoundsService(BaseService):
 
     def __init__(self, config: Config, data_scraper: Optional[DataScraper] = None):
         super().__init__(config)
-        self.data_scraper = data_scraper or DataScraper()
+        self.data_scraper = data_scraper or DataScraper(config)
 
     def get_all_rounds(self, league_id: int, season: str, start_round: int, end_round: int,
                        output_path: str = 'retrieved_data/raw/', output_file: str = None,

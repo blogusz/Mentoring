@@ -35,19 +35,19 @@ class ApiClient:
         self._schedule_service = ScheduleService(self.config)
 
     def get_all_rounds(self, league_id: int, season: str, start_round: int, end_round: int,
-                       output_path: str = 'retrieved_data/raw/', output_file: str = None, save_data: bool = False) -> \
+                       output_path: str = None, output_file: str = None, save_data: bool = False) -> \
             list[Any]:
         """
         Retrieve data for consecutive rounds for the specified season and league.
 
-        :param league_id: League ID (e.g. 4335 for Spanish La Liga).
-        :param season: Season (e.g. '2024-2025').
-        :param start_round: Number of the first round to retrieve.
-        :param end_round: Number of the last round to retrieve (inclusive).
-        :param output_path: Path where the data will be saved if save_data is True.
-        :param output_file: Name of the file where the data will be saved if save_data is True.
-        :param save_data: Whether the data is to be saved to disk.
-        :return: List of round data.
+        :param league_id: League ID (e.g. 4335 for Spanish La Liga)
+        :param season: Season (e.g. '2024-2025')
+        :param start_round: Number of the first round to retrieve
+        :param end_round: Number of the last round to retrieve (inclusive)
+        :param output_path: Optional override for output path from config
+        :param output_file: Optional override for output filename from config
+        :param save_data: Whether the data is to be saved to disk
+        :return: List of round data
         """
         return self._rounds_service.get_all_rounds(
             league_id=league_id,
