@@ -1,6 +1,9 @@
 import os
 import yaml
 from typing import Optional
+import requests
+
+from requests import RequestException
 
 
 class Config:
@@ -45,6 +48,26 @@ class Config:
                     with open(path, 'r') as f:
                         self.config_data = yaml.safe_load(f)
 
+                        if 'api' not in self.config_data:
+                            print(f"Error in {path}: 'api' section is missing")
+                            continue
+
+                        if 'key' not in self.config_data['api']:
+                            print(f"Error in {path}: 'api.key' is missing")
+                            continue
+
+                        if 'base_url' not in self.config_data['api']:
+                            print(f"Error in {path}: 'api.base_url' is missing")
+                            continue
+
+                        if not self.config_data['api']['key']:
+                            print(f"Error in {path}: 'api.key' is empty")
+                            continue
+
+                        if not self.config_data['api']['base_url']:
+                            print(f"Error in {path}: 'api.base_url' is empty")
+                            continue
+
                     self.api_key = self.config_data['api']['key']
                     self.base_url = self.config_data['api']['base_url']
                     return True
@@ -53,10 +76,36 @@ class Config:
 
         return False
 
+    def _verify_api_connection(self) -> bool:
+        """
+        Verify that the API credentials work by making a test request.
+
+        :return: True if connection is successful, False otherwise
+        """
+        try:
+            # Use a simple endpoint that should always work
+            url = f'{self.base_url}/{self.api_key}/'
+            response = requests.get(url)
+            #
+            if response.status_code == 403:
+                # Status code 403 (Forbidden) is returned when the request is not allowed but credentials are correct
+                print("API connection verified successfully")
+                return True
+            else:
+                print(f"API connection failed with status code: {response.status_code}")
+                return False
+
+        except RequestException as e:
+            print(f"API connection failed: {e}")
+            return False
+
     def _load_config(self, config_path: Optional[str] = None) -> None:
         if not self._load_yaml_config(config_path):
             raise ValueError(
                 "Failed to load configuration. Please provide a valid YAML config file or API credentials.")
+        if not self._verify_api_connection():
+            raise ValueError(
+                "Failed to connect to API with the provided credentials. Please check your API key and base URL.")
 
     def get_credentials(self):
         return self.api_key, self.base_url
