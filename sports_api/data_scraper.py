@@ -93,3 +93,24 @@ class DataScraper:
             start_round=start_round,
             end_round=end_round
         )
+
+    def scrape_league_table(self, league_id: int, season: str, output_path: str = None, output_file: str = None,
+                            save_data: bool = False) -> list[Any]:
+        """
+        Scrape the league table for a specific league and season.
+
+        :param league_id: League ID (e.g. 4335 for Spanish La Liga)
+        :param season: Season (e.g. '2024-2025')
+        :param output_path: Optional override for output path from config
+        :param output_file: Optional override for output filename from config
+        :param save_data: Whether the data is to be saved to disk
+        :return: League table data
+        """
+        return self.scrape_data(
+            scraper_func=self.api_client.get_league_table,
+            save_data=save_data,
+            output_path=output_path,
+            output_file=output_file,
+            league_id=league_id,
+            season=season
+        )
