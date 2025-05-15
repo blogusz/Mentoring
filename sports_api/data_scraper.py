@@ -1,24 +1,53 @@
 import json
 import os
 from time import sleep
-from typing import Any
+from typing import Any, Dict, Callable, Optional
 
 from sports_api.config import Config
 from sports_api import ApiClient
+from sports_api.utils.file_utils import save_json_file
 
 
 class DataScraper:
+    """
+        Responsible for scraping data from the API and saving it to disk.
+    """
+
     def __init__(self, config: Config = None, api_client: ApiClient = None):
         self.config = config
         self.api_client = api_client or (ApiClient(config) if config else None)
 
+    def scrape_data(self, scraper_func: Callable, save_data: bool = False,
+                    output_path: str = None, output_file: str = None, **kwargs) -> Any:
+        """
+        Generic method to scrape data using the provided scraper function.
+
+        :param scraper_func: Function that will be called to retrieve data
+        :param save_data: Whether to save the data to disk
+        :param output_path: Optional override for output path
+        :param output_file: Optional override for output filename
+        :param kwargs: Additional arguments to pass to the scraper function
+        :return: The scraped data
+        """
+        data = scraper_func(**kwargs)
+
+        if data and save_data and self.config:
+            storage_config = self.config.get_output_settings()
+            final_path = output_path or storage_config['output_path']
+            final_file = output_file or storage_config['default_file']
+            save_json_file(data, final_path, final_file)
+
+        return data
+
     def _retrieve_all_rounds(self, league_id: int, season: str, start_round: int, end_round: int) -> list[Any]:
         """
-        :param league_id: League ID (e.g. 4335 for Spanish La Liga).
-        :param season: Season (e.g. '2024-2025').
-        :param start_round: Number of the first round to retrieve.
-        :param end_round: Number of the last round to retrieve (inclusive).
-        :return:
+        Retrieve data for all rounds in the specified range.
+
+        :param league_id: League ID (e.g. 4335 for Spanish La Liga)
+        :param season: Season (e.g. '2024-2025')
+        :param start_round: Number of the first round to retrieve
+        :param end_round: Number of the last round to retrieve (inclusive)
+        :return: List of all matches from the specified rounds
         """
         all_rounds_data = []
 
@@ -40,45 +69,10 @@ class DataScraper:
 
         return all_rounds_data
 
-    @staticmethod
-    def _make_directory(path: str):
+    def scrape_all_rounds(self, league_id: int, season: str, start_round: int = 1, end_round: int = 38,
+                          output_path: str = None, output_file: str = None, save_data: bool = False) -> list[Any]:
         """
-        :param path: Path where the folder will be created.
-        :return: bool
-        """
-        if not os.path.exists(path):
-            try:
-                os.makedirs(path)
-                return True
-            except OSError as e:
-                print(f'Error while making directory {path}: {e}')
-                return False
-
-    def _save_json_file(self, data: list[Any], output_path: str = None, output_file: str = None) -> None:
-        """
-        Save data to JSON file.
-
-        :param data: Variable with the data to be saved.
-        :param output_path: Optional override for output path from config.
-        :param output_file: Optional override for output filename from config.
-        """
-        storage_config = self.config.get_output_settings()
-
-        final_path = output_path or storage_config['output_path']
-        final_file = output_file or storage_config['default_file']
-
-        self._make_directory(final_path)
-
-        output_file_path = os.path.join(final_path, final_file)
-        with open(output_file_path, 'w', encoding='utf-8') as f:
-            json.dump(data, f, ensure_ascii=False, indent=4)
-        print(f'Data saved to: {output_file_path}')
-
-    def scrape_all_rounds(self, league_id: int, season: str, start_round: int = None, end_round: int = None,
-                          output_path: str = None, output_file: str = None, save_data=False) -> list[Any]:
-        """
-        The function retrieves data from the API for consecutive rounds (from start_round to end_round inclusive)
-        for the specified season and league, and then saves all the returned data to a single JSON file.
+        Scrape data for consecutive rounds for the specified season and league.
 
         :param league_id: League ID (e.g. 4335 for Spanish La Liga)
         :param season: Season (e.g. '2024-2025')
@@ -87,9 +81,15 @@ class DataScraper:
         :param output_path: Optional override for output path from config
         :param output_file: Optional override for output filename from config
         :param save_data: Whether the data is to be saved to disk
-        :rtype: list[Any]
+        :return: List of round data
         """
-        all_rounds_data = self._retrieve_all_rounds(league_id, season, start_round, end_round)
-        if all_rounds_data and save_data:
-            self._save_json_file(all_rounds_data, output_path, output_file)
-        return all_rounds_data
+        return self.scrape_data(
+            scraper_func=self._retrieve_all_rounds,
+            save_data=save_data,
+            output_path=output_path,
+            output_file=output_file,
+            league_id=league_id,
+            season=season,
+            start_round=start_round,
+            end_round=end_round
+        )
