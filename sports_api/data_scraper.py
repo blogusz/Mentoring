@@ -20,25 +20,25 @@ class DataScraper:
         :param end_round: Number of the last round to retrieve (inclusive).
         :return:
         """
-        all_matches = []
+        all_rounds_data = []
 
-        for round_number in range(start_round, end_round + 1):
-            print(f'Retrieving data for round {round_number}')
+        for round_num in range(start_round, end_round + 1):
+            print(f"Retrieving data for round {round_num}")
 
             try:
-                data = self.api_client.get_events_by_round(league_id, round_number, season)
-                if data and data.get('events'):
-                    matches = data['events']
-                    all_matches.extend(matches)
-                    print(f'Round {round_number}: retrieved {len(matches)} matches.')
+                round_data = self.api_client.get_events_by_round(league_id, round_num, season)
+                if round_data and round_data.get('events'):
+                    matches = round_data['events']
+                    all_rounds_data.extend(matches)
+                    print(f'Round {round_num}: retrieved {len(matches)} matches.')
                 else:
-                    print(f'Round {round_number}: no data was found.')
+                    print(f'Round {round_num}: no data was found.')
             except Exception as e:
-                print(f'Error while retrieving data for round {round_number}: {e}')
+                print(f'Error while retrieving data for round {round_num}: {e}')
 
             sleep(1)
 
-        return all_matches
+        return all_rounds_data
 
     @staticmethod
     def _make_directory(path: str):
@@ -56,15 +56,12 @@ class DataScraper:
 
     def _save_json_file(self, data: list[Any], output_path: str = None, output_file: str = None) -> None:
         """
-        Save data to JSON file using configuration settings.
+        Save data to JSON file.
 
-        :param data: Variable with the data to be saved
-        :param output_path: Optional override for output path from config
-        :param output_file: Optional override for output filename from config
+        :param data: Variable with the data to be saved.
+        :param output_path: Optional override for output path from config.
+        :param output_file: Optional override for output filename from config.
         """
-        if not self.config:
-            raise ValueError("Config object is required for saving data")
-
         storage_config = self.config.get_output_settings()
 
         final_path = output_path or storage_config['output_path']
@@ -75,7 +72,7 @@ class DataScraper:
         output_file_path = os.path.join(final_path, final_file)
         with open(output_file_path, 'w', encoding='utf-8') as f:
             json.dump(data, f, ensure_ascii=False, indent=4)
-        print(f'Data saved to directory: {output_file_path}')
+        print(f'Data saved to: {output_file_path}')
 
     def scrape_all_rounds(self, league_id: int, season: str, start_round: int = None, end_round: int = None,
                           output_path: str = None, output_file: str = None, save_data=False) -> list[Any]:
@@ -93,6 +90,6 @@ class DataScraper:
         :rtype: list[Any]
         """
         all_rounds_data = self._retrieve_all_rounds(league_id, season, start_round, end_round)
-        if save_data:
+        if all_rounds_data and save_data:
             self._save_json_file(all_rounds_data, output_path, output_file)
         return all_rounds_data
