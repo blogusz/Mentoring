@@ -3,8 +3,8 @@ from typing import Any, Callable
 
 from sports_api import ApiClient
 from sports_api.config import Config
-from sports_api.utils.datascraper_utils import generate_file_path
-from sports_api.utils.file_utils import save_json_file
+from sports_api.storage.file_storage import FileStorage
+from sports_api.storage.storage_interface import StorageInterface
 
 
 class DataScraper:
@@ -12,40 +12,39 @@ class DataScraper:
         Responsible for scraping data from the API and saving it to disk.
     """
 
-    def __init__(self, config: Config = None, api_client: ApiClient = None):
+    def __init__(self, config: Config = None, api_client: Any = None, storage: StorageInterface = None):
+        """
+        Initialize the data scraper.
+
+        :param config: Config object
+        :param api_client: Any API client that provides data retrieval methods
+        :param storage: StorageInterface object to use for saving data (defaults to FileStorage)
+        """
         self.config = config
         self.api_client = api_client or (ApiClient(config) if config else None)
 
         if not self.api_client:
             raise ValueError("Either valid config or api_client must be provided.")
 
-    def scrape_data(self, scraper_func: Callable, save_data: bool = False, output_path: str = None,
-                    output_file: str = None, data_type: str = None, **kwargs) -> Any:
+        if storage:
+            self.storage = storage
+        else:
+            self.storage = FileStorage(config)
+
+    def scrape_data(self, scraper_func: Callable, save_data: bool = False, data_type: str = None, **kwargs) -> Any:
         """
         Generic method to scrape data using the provided scraper function.
 
         :param scraper_func: Function that will be called to retrieve data
         :param save_data: Whether to save the data to disk
-        :param output_path: Optional override for output path
-        :param output_file: Optional override for output filename
         :param data_type: Type of data for automatic file naming
-        :param kwargs: Additional arguments to pass to the scraper function
+        :param kwargs: Additional arguments to pass to the scraper function and storage
         :return: The scraped data
         """
         data = scraper_func(**kwargs)
 
-        if data and save_data:
-            # If output_path or output_file are not provided, generate them
-            if data_type and not (output_path and output_file):
-                generated_path, generated_file = generate_file_path(self.config, data_type, **kwargs)
-                final_path = output_path or generated_path
-                final_file = output_file or generated_file
-            else:
-                storage_config = self.config.get_output_settings()
-                final_path = output_path or storage_config['output_path']
-                final_file = output_file or storage_config['default_file']
-
-            save_json_file(data, final_path, final_file)
+        if data and save_data and self.storage:
+            self.storage.save(data, data_type, **kwargs)
 
         return data
 
@@ -74,14 +73,16 @@ class DataScraper:
                     print(f'Round {round_num}: retrieved {len(matches)} matches.')
 
                     if save_individual_rounds:
-                        round_dir, round_file = generate_file_path(
-                            config=self.config,
-                            data_type="rounds",
-                            league_id=league_id,
-                            season=season,
-                            round_num=round_num
-                        )
-                        save_json_file(matches, round_dir, round_file)
+                        if self.storage:
+                            self.storage.save(
+                                data=matches,
+                                data_type="rounds",
+                                league_id=league_id,
+                                season=season,
+                                round_num=round_num
+                            )
+                        else:
+                            print("No storage implementation provided, skipping individual round save.")
                 else:
                     print(f'Round {round_num}: no data was found.')
             except Exception as e:
