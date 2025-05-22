@@ -111,8 +111,8 @@ class DataScraper:
         return self.scrape_data(
             scraper_func=self._retrieve_all_rounds,
             save_data=save_all_rounds,
-            output_path=output_path,
-            output_file=output_file,
+            # output_path=output_path,
+            # output_file=output_file,
             data_type="rounds",
             league_id=league_id,
             season=season,
@@ -136,8 +136,8 @@ class DataScraper:
         return self.scrape_data(
             scraper_func=self.api_client.get_league_table,
             save_data=save_data,
-            output_path=output_path,
-            output_file=output_file,
+            # output_path=output_path,
+            # output_file=output_file,
             data_type="league_table",
             league_id=league_id,
             season=season
