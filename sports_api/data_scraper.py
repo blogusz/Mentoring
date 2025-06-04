@@ -5,6 +5,8 @@ from sports_api import ApiClient
 from sports_api.config import Config
 from sports_api.storage.file_storage import FileStorage
 from sports_api.storage.storage_interface import StorageInterface
+from sports_api.storage.db_storage import DatabaseStorage
+from sports_api.utils.datascraper_utils import league_id_to_name
 
 
 class DataScraper:
@@ -12,13 +14,15 @@ class DataScraper:
         Responsible for scraping data from the API and saving it to disk.
     """
 
-    def __init__(self, config: Config = None, api_client: Any = None, storage: StorageInterface = None):
+    def __init__(self, config: Config = None, api_client: Any = None, storage: StorageInterface = None,
+                 use_db_storage: bool = True):
         """
         Initialize the data scraper.
 
         :param config: Config object
         :param api_client: Any API client that provides data retrieval methods
         :param storage: StorageInterface object to use for saving data (defaults to FileStorage)
+        :param use_db_storage: Whether to use database storage in addition to file storage
         """
         self.config = config
         self.api_client = api_client or (ApiClient(config) if config else None)
@@ -30,6 +34,10 @@ class DataScraper:
             self.storage = storage
         else:
             self.storage = FileStorage(config)
+
+        self.db_storage = None
+        if use_db_storage and config and 'database' in config.config_data:
+            self.db_storage = DatabaseStorage(config)
 
     def scrape_data(self, scraper_func: Callable, save_data: bool = False, data_type: str = None, **kwargs) -> Any:
         """
@@ -142,3 +150,65 @@ class DataScraper:
             league_id=league_id,
             season=season
         )
+
+    def scrape_countries_to_db(self, save_to_file: bool = False) -> int:
+        """
+        Scrape countries data and save to database.
+
+        :param save_to_file: Whether to also save to file
+        :return: Number of countries saved
+        """
+        countries = self.api_client.get_all_countries()
+
+        if save_to_file and self.storage:
+            self.storage.save(countries, "countries")
+
+        if self.db_storage:
+            return self.db_storage.save_countries(countries.get('countries', []))
+        return 0
+
+    def scrape_leagues_to_db(self, save_to_file: bool = False) -> int:
+        """
+        Scrape leagues data and save to database.
+
+        :param save_to_file: Whether to also save to file
+        :return: Number of leagues saved
+        """
+        leagues = self.api_client.get_all_leagues()
+
+        if save_to_file and self.storage:
+            self.storage.save(leagues, "leagues")
+
+        if self.db_storage:
+            return self.db_storage.save_leagues(leagues.get('leagues', []))
+        return 0
+
+    def scrape_teams_by_league_to_db(self, league_id: int, save_to_file: bool = False) -> int:
+        """
+        Scrape teams for a specific league and save to database.
+
+        :param league_id: League ID
+        :param save_to_file: Whether to also save to file
+        :return: Number of teams saved
+        """
+
+        league_name = league_id_to_name(league_id)
+        teams = self.api_client.get_teams_in_league(league_name)
+
+        if save_to_file and self.storage:
+            self.storage.save(teams, "teams", league_id=league_id)
+
+        if self.db_storage:
+            return self.db_storage.save_teams(teams.get('teams', []))
+        return 0
+
+    def scrape_matches_to_db(self) -> int:
+        """
+        Scrape matches for a league and season and save to database.
+
+        :return: Number of matches saved
+        """
+        # TODO implement this method
+        pass
+
+        return 0

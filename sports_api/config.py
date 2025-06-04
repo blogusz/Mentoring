@@ -127,3 +127,24 @@ class Config:
         config = defaults.copy()
         config.update(self.config_data['data'])
         return config
+
+    def get_database_config(self) -> dict:
+        """
+        Get database configuration settings.
+        Returns merged configuration with defaults for missing values.
+        """
+        defaults = {
+            'host': 'localhost',
+            'port': '5432',
+            'dbname': 'sportsdb',
+            'user': 'postgres',
+            'password': 'postgres'
+        }
+
+        if 'database' not in self.config_data:
+            return defaults
+
+        # Merge defaults with values from config file
+        config = defaults.copy()
+        config.update(self.config_data['database'])
+        return config
