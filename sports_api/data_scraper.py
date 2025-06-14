@@ -11,7 +11,7 @@ from sports_api.utils.datascraper_utils import league_id_to_name
 
 class DataScraper:
     """
-        Responsible for scraping data from the API and saving it to disk.
+    Responsible for scraping data from the API and saving it to disk.
     """
 
     def __init__(self, config: Config = None, api_client: Any = None, storage: StorageInterface = None,
@@ -177,10 +177,10 @@ class DataScraper:
         leagues = self.api_client.get_all_leagues()
 
         if save_to_file and self.storage:
-            self.storage.save(leagues, "leagues")
+            self.storage.save(leagues, "all")
 
         if self.db_storage:
-            return self.db_storage.save_leagues(leagues.get('leagues', []))
+            return self.db_storage.save_leagues(leagues.get('all', []))
         return 0
 
     def scrape_teams_by_league_to_db(self, league_id: int, save_to_file: bool = False) -> int:
