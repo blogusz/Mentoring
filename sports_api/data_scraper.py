@@ -14,15 +14,13 @@ class DataScraper:
     Responsible for scraping data from the API and saving it to disk.
     """
 
-    def __init__(self, config: Config = None, api_client: Any = None, storage: StorageInterface = None,
-                 use_db_storage: bool = True):
+    def __init__(self, config: Config = None, api_client: Any = None, storage: StorageInterface = None):
         """
         Initialize the data scraper.
 
         :param config: Config object
         :param api_client: Any API client that provides data retrieval methods
         :param storage: StorageInterface object to use for saving data (defaults to FileStorage)
-        :param use_db_storage: Whether to use database storage in addition to file storage
         """
         self.config = config
         self.api_client = api_client or (ApiClient(config) if config else None)
@@ -32,19 +30,19 @@ class DataScraper:
 
         if storage:
             self.storage = storage
+        elif self.config and 'database' in self.config.config_data:
+            # Database is configured, use DatabaseStorage by default
+            self.storage = DatabaseStorage(self.config)
         else:
+            # Default to FileStorage
             self.storage = FileStorage(config)
-
-        self.db_storage = None
-        if use_db_storage and config and 'database' in config.config_data:
-            self.db_storage = DatabaseStorage(config)
 
     def scrape_data(self, scraper_func: Callable, save_data: bool = False, data_type: str = None, **kwargs) -> Any:
         """
         Generic method to scrape data using the provided scraper function.
 
         :param scraper_func: Function that will be called to retrieve data
-        :param save_data: Whether to save the data to disk
+        :param save_data: Whether to save the data
         :param data_type: Type of data for automatic file naming
         :param kwargs: Additional arguments to pass to the scraper function and storage
         :return: The scraped data
@@ -151,64 +149,61 @@ class DataScraper:
             season=season
         )
 
-    def scrape_countries_to_db(self, save_to_file: bool = False) -> int:
+    def scrape_countries(self, save_data: bool = True) -> dict:
         """
-        Scrape countries data and save to database.
+        Scrape countries data.
 
-        :param save_to_file: Whether to also save to file
-        :return: Number of countries saved
+        :param save_data: Whether to save the data
+        :return: Countries data
         """
-        countries = self.api_client.get_all_countries()
+        return self.scrape_data(
+            scraper_func=self.api_client.get_all_countries,
+            save_data=save_data,
+            data_type="countries"
+        )
 
-        if save_to_file and self.storage:
-            self.storage.save(countries, "countries")
-
-        if self.db_storage:
-            return self.db_storage.save_countries(countries.get('countries', []))
-        return 0
-
-    def scrape_leagues_to_db(self, save_to_file: bool = False) -> int:
+    def scrape_leagues(self, save_data: bool = True) -> dict:
         """
-        Scrape leagues data and save to database.
+        Scrape leagues data.
 
-        :param save_to_file: Whether to also save to file
-        :return: Number of leagues saved
+        :param save_data: Whether to save the data
+        :return: Leagues data
         """
-        leagues = self.api_client.get_all_leagues()
+        return self.scrape_data(
+            scraper_func=self.api_client.get_all_leagues,
+            save_data=save_data,
+            data_type="leagues"
+        )
 
-        if save_to_file and self.storage:
-            self.storage.save(leagues, "all")
-
-        if self.db_storage:
-            return self.db_storage.save_leagues(leagues.get('all', []))
-        return 0
-
-    def scrape_teams_by_league_to_db(self, league_id: int, save_to_file: bool = False) -> int:
+    def scrape_teams_by_league(self, league_id: int, save_data: bool = True) -> dict:
         """
-        Scrape teams for a specific league and save to database.
+        Scrape teams for a specific league.
 
         :param league_id: League ID
-        :param save_to_file: Whether to also save to file
-        :return: Number of teams saved
+        :param save_data: Whether to save the data
+        :return: Teams data
         """
-
         league_name = league_id_to_name(league_id)
-        teams = self.api_client.get_teams_in_league(league_name)
+        return self.scrape_data(
+            scraper_func=lambda: self.api_client.get_teams_in_league(league_name),
+            save_data=save_data,
+            data_type="teams",
+            league_id=league_id
+        )
 
-        if save_to_file and self.storage:
-            self.storage.save(teams, "teams", league_id=league_id)
-
-        if self.db_storage:
-            return self.db_storage.save_teams(teams.get('teams', []))
-        return 0
-
-    def scrape_matches_to_db(self) -> int:
+    def scrape_season_matches(self, league_id: int, season: str, save_data: bool = True) -> dict:
         """
-        Scrape matches for a league and season and save to database.
+        Scrape all matches for a league and season.
 
-        :return: Number of matches saved
+        :param league_id: League ID
+        :param season: Season (e.g. '2024-2025')
+        :param save_data: Whether to save the data
+        :return: Matches data
         """
-        # TODO implement this method
-        pass
-
-        return 0
+        return self.scrape_data(
+            scraper_func=self.api_client.get_events_in_league_by_season,
+            save_data=save_data,
+            data_type="season_matches",
+            league_id=league_id,
+            season=season
+        )

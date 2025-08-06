@@ -59,8 +59,12 @@ def generate_file_path(config: Config, data_type: str, league_id: int = None, se
         directory = os.path.join(base_path, "tables", league_name, formatted_season)
         filename = f"{league_name}_{formatted_season}_table.json"
 
+    elif data_type == "season_matches":
+        directory = os.path.join(base_path, "matches", league_name, formatted_season)
+        filename = f"{league_name}_{formatted_season}_all_matches.json"
+
     else:
-        # Default case
+        # Default case (works for countries, leagues, teams, players, venues, etc.)
         directory = os.path.join(base_path, data_type)
         filename = f"{data_type}_{league_name}_{formatted_season}.json"
 
