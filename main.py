@@ -1,23 +1,23 @@
-from pprint import pprint
-
-from sports_api.api_client import ApiClient
+from sports_api.config import Config
+from sports_api.data_scraper import DataScraper
+from sports_api.storage.file_storage import FileStorage
+from sports_api.storage.db_storage import DatabaseStorage
 
 if __name__ == '__main__':
-    api_client = ApiClient()
+    config = Config()
 
-    # Get all rounds for a league
-    rounds_data = api_client.get_all_rounds(
-        league_id=4335,  # Spanish La Liga
-        season='2024-2025',
-        start_round=1,
-        end_round=5,
-        output_file='data.json',
-        save_data=True
-    )
-    pprint(rounds_data)
+    # Test with file storage (default)
+    print("=== Testing with File Storage ===")
+    file_scraper = DataScraper(config, storage=FileStorage(config))
+    countries = file_scraper.scrape_countries(save_data=True)
+    print(f"Saved {len(countries.get('countries', []))} countries to files")
 
-    # Example of using other API methods
-    # leagues = api_client.get_all_leagues()
-    # pprint(leagues)
-    # team = api_client.search_team("Barcelona")
-    # pprint(team)
+    # Test with database storage
+    print("\n=== Testing with Database Storage ===")
+    db_scraper = DataScraper(config, storage=DatabaseStorage(config))
+    countries = db_scraper.scrape_countries(save_data=True)
+    print(f"Saved countries to database")
+
+    # Test leagues
+    leagues = db_scraper.scrape_leagues(save_data=True)
+    print(f"Saved leagues to database")
